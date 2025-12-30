@@ -3,6 +3,7 @@ package co.tiagoaguiar.megasenacomposedev
 import android.os.Bundle
 import android.util.Log
 import android.content.Context
+import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -54,8 +55,13 @@ fun MainApp() {
 
     val context = LocalContext.current
 
+    val prefers = context.getSharedPreferences("megasena", Context.MODE_PRIVATE)
+
     val result = remember {
-        mutableStateOf("Resultado APARECE aqui!")
+        mutableStateOf(prefers.getString(
+            PREFERS_KEY,
+            ""
+        ) ?: "")
     }
     val textFieldBet = remember {
         mutableStateOf("")
@@ -117,6 +123,7 @@ fun MainApp() {
                     return@Button
                 }
                 result.value = numberGenerator(textFieldBet.value.toInt())
+                saveNumberSequence(prefers, result.value)
             }) {
                 Text("Gerar números")
             }
@@ -163,6 +170,17 @@ fun validateTextField(text: String): Boolean {
     return true
 
 }
+
+fun saveNumberSequence(prefers: SharedPreferences, numberSequence: String){
+
+    prefers.edit().apply{
+        putString(PREFERS_KEY, numberSequence)
+        apply()
+    }
+
+
+}
+const val PREFERS_KEY = "key_mega"
 
 
 @Preview(showBackground = true)
