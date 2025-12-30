@@ -88,7 +88,7 @@ fun MainApp() {
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done,
 
-                    ),
+                        ),
                     value = textFieldBet.value,
                     label = {
                         Text("Digite um número entre 6 e 15")
@@ -105,9 +105,18 @@ fun MainApp() {
             }
 
             Button(onClick = {
+                val numberIsValid = validateTextField(textFieldBet.value)
 
-                val res = numberGenerator(context, textFieldBet.value.toInt())
-                result.value = res
+                if (!numberIsValid) {
+                    Toast.makeText(
+                        context,
+                        "Digite um número entre 6 e 15!",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@Button
+                }
+                result.value = numberGenerator(textFieldBet.value.toInt())
             }) {
                 Text("Gerar números")
             }
@@ -115,39 +124,44 @@ fun MainApp() {
     }
 }
 
-fun numberGenerator(context: Context, qtd: Int): String{
-    var result = ""
+fun numberGenerator(qtd: Int): String {
 
-    if(qtd >= 6 && qtd <= 15){
+    val numbers = mutableSetOf<Int>()
+    while (true) {
+        val n = Random().nextInt(60)
+        numbers.add(n + 1)
 
-        val numbers = mutableSetOf<Int>()
-        while (true){
-            val n = Random().nextInt(60)
-            numbers.add(n + 1)
-
-            if(numbers.size == qtd){
-                break
-            }
+        if (numbers.size == qtd) {
+            break
         }
-
-        result = numbers.joinToString(" - ")
-
-    } else {
-        Toast.makeText(context,
-            "Digite um número entre 6 e 15!",
-            Toast.LENGTH_LONG).show()
     }
 
-    return result
+    return numbers.joinToString(" - ")
+
 }
 
-fun validateInput(number: String): String{
+fun validateInput(number: String): String {
 
     val filteredChars = number.filter {
         it in "0123456789"
     }
 
     return filteredChars
+}
+
+fun validateTextField(text: String): Boolean {
+
+    if (text.isEmpty()) {
+        return false
+    }
+
+    val qtd = text.toInt()
+    if (qtd < 6 || qtd > 15) {
+        return false
+    }
+
+    return true
+
 }
 
 
