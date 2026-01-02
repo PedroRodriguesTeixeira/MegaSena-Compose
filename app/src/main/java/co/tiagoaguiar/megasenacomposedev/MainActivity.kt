@@ -55,13 +55,10 @@ fun MainApp() {
 
     val context = LocalContext.current
 
-    val prefers = context.getSharedPreferences("megasena", Context.MODE_PRIVATE)
+    val prefs = PreferencesManager(context)
 
     val result = remember {
-        mutableStateOf(prefers.getString(
-            PREFERS_KEY,
-            ""
-        ) ?: "")
+        mutableStateOf(prefs.getData(PREFERS_KEY))
     }
     val textFieldBet = remember {
         mutableStateOf("")
@@ -123,7 +120,7 @@ fun MainApp() {
                     return@Button
                 }
                 result.value = numberGenerator(textFieldBet.value.toInt())
-                saveNumberSequence(prefers, result.value)
+                prefs.saveData(PREFERS_KEY, result.value)
             }) {
                 Text("Gerar números")
             }
@@ -171,15 +168,6 @@ fun validateTextField(text: String): Boolean {
 
 }
 
-fun saveNumberSequence(prefers: SharedPreferences, numberSequence: String){
-
-    prefers.edit().apply{
-        putString(PREFERS_KEY, numberSequence)
-        apply()
-    }
-
-
-}
 const val PREFERS_KEY = "key_mega"
 
 
